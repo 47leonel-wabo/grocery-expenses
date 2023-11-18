@@ -40,6 +40,7 @@ const ExpenseForm = ({ categories }: Props) => {
         </div>
         {
           <CategorySelector
+            utility="registering"
             items={categories}
             handleChange={(category) => {
               console.log("selected category", category);

@@ -1,19 +1,48 @@
+import { useEffect, useState } from "react";
 import { ShoppingItem } from "../App";
 import CategorySelector from "./CategorySelector";
+import ItemRow from "./ItemRow";
 
 interface Props {
   shoppingItems: ShoppingItem[];
   categories: string[];
+  handleRemove: (item: ShoppingItem) => void;
 }
 
-const ShoppingList = ({ shoppingItems, categories }: Props) => {
+const ShoppingList = ({ shoppingItems, categories, handleRemove }: Props) => {
+  const [categoryList, setCategoryList] = useState<string[]>(categories);
+  const [shoppingList, setShoppingList] =
+    useState<ShoppingItem[]>(shoppingItems);
+
+  useEffect(() => {
+    // make sure that this component list is updated with the one received from his parent
+    setShoppingList(shoppingItems);
+    // filter and remove any duplicate category element (e.i: in case there are many items of the same category)
+    setCategoryList([
+      ...new Set(shoppingItems.map(({ category }) => category)),
+    ]);
+  }, [shoppingItems]);
+
   const accessExpenses = (items: ShoppingItem[]): string => {
     return items
       .reduce((accumulator, current) => accumulator + current.price, 0)
       .toFixed(2);
   };
 
-  if (shoppingItems.length === 0)
+  function filter(criteria: string) {
+    return shoppingItems.filter((item) => item.category === criteria);
+  }
+
+  const getFilteringCriteria = (criteria: string) => {
+    if (criteria === "all") {
+      setShoppingList(shoppingItems);
+    } else {
+      const filteredList = filter(criteria);
+      setShoppingList(filteredList);
+    }
+  };
+
+  if (shoppingList.length === 0)
     return (
       <div className="col p-4 m-3" style={{ backgroundColor: "#eeeeee78" }}>
         <h6 className="display-6">Empty list, nothing to show</h6>
@@ -24,10 +53,9 @@ const ShoppingList = ({ shoppingItems, categories }: Props) => {
     <div className="col p-4">
       <h4 className="display-6">Your Shopping List</h4>
       <CategorySelector
-        items={categories}
-        handleChange={(category) => {
-          console.log("selected category", category);
-        }}
+        utility="filtering"
+        items={categoryList}
+        handleChange={getFilteringCriteria}
       />
       <table className="table">
         <thead>
@@ -40,13 +68,13 @@ const ShoppingList = ({ shoppingItems, categories }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {shoppingItems.map((item, index) => (
+          {shoppingList.map((item, index) => (
             <tr key={index}>
-              <th scope="row">{index}</th>
-              <td>{item.name}</td>
-              <td>{item.price}</td>
-              <td>{item.category}</td>
-              <td>@action</td>
+              <ItemRow
+                item={item}
+                index={index}
+                handleBtnRemoveClick={handleRemove}
+              />
             </tr>
           ))}
         </tbody>
@@ -55,7 +83,7 @@ const ShoppingList = ({ shoppingItems, categories }: Props) => {
         <h6>
           Total expense:
           <mark>
-            <b>${accessExpenses(shoppingItems)}</b>
+            <b>${accessExpenses(shoppingList)}</b>
           </mark>
         </h6>
       </div>
