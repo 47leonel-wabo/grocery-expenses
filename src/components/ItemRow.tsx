@@ -1,4 +1,3 @@
-import { Key } from "react";
 import { ShoppingItem } from "../App";
 
 interface Props {
@@ -10,7 +9,7 @@ interface Props {
 const ItemRow = ({ item, index, handleBtnRemoveClick }: Props) => {
   return (
     <>
-      <th scope="row">{index}</th>
+      <th scope="row">{item.id}</th>
       <td>{item.name}</td>
       <td>{item.price}</td>
       <td>{item.category}</td>

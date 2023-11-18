@@ -8,10 +8,10 @@ interface Props {
   saveExpense: (item: Expense) => void;
 }
 
-interface Expense {
+export interface Expense {
   name: string;
   price: number;
-  category: "Grocery" | "Cake" | "Juice";
+  category: string;
 }
 
 const formSchema = z.object({
@@ -20,22 +20,32 @@ const formSchema = z.object({
     .min(4, { message: "At least 4 characters for item's name" })
     .max(20, { message: "Not more than 20 character for item's name" }),
   price: z.number({ required_error: "(Required) item's price" }),
-  category: z
-    .string()
-    .refine((val) => ["Grocery", "Cake", "Juice"].includes(val)),
 });
+
+type formObject = z.infer<typeof formSchema>;
 
 const ExpenseForm = ({ categories, saveExpense }: Props) => {
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm({
+    reset,
+  } = useForm<formObject>({
     resolver: zodResolver(formSchema),
   });
 
+  let cat: string = "";
+
+  const handleSelect = (value: string) => {
+    cat = value;
+  };
+
   const onSubmit = (data: FieldValues) => {
-    console.log(data);
+    if (cat.length === 0) {
+      cat = "Grocery";
+    }
+    saveExpense({ name: data.name, price: data.price, category: cat });
+    reset({ name: "", price: 0 });
   };
 
   return (
@@ -63,7 +73,7 @@ const ExpenseForm = ({ categories, saveExpense }: Props) => {
             Price
           </label>
           <input
-            {...register("price")}
+            {...register("price", { valueAsNumber: true })}
             type="number"
             className="form-control"
             id="itemPrice"
@@ -79,16 +89,9 @@ const ExpenseForm = ({ categories, saveExpense }: Props) => {
         <CategorySelector
           utility="registering"
           items={categories}
-          handleChange={(category) => {
-            console.log("selected category", category);
-          }}
+          handleChange={handleSelect}
         />
 
-        {errors.category && (
-          <p id="itemCategoryMessage" className="form-text text-danger">
-            Category error
-          </p>
-        )}
         <button type="submit" className="btn btn-info">
           Save to List
         </button>

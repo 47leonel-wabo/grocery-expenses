@@ -17,7 +17,9 @@ const CategorySelector = ({
         onChange={(elt) => handleChange(elt.target.value)}
       >
         <option disabled defaultValue="all">
-          Open to select category
+          {utility === "registering"
+            ? "Choose grocery category"
+            : "Select a criteria to filter on"}
         </option>
         {utility === "filtering" && <option value="all">All</option>}
         {items.map((item, index) => (

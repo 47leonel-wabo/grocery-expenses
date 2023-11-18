@@ -23,16 +23,19 @@ const ShoppingList = ({ shoppingItems, categories, handleRemove }: Props) => {
     ]);
   }, [shoppingItems]);
 
+  // re-assess expenses as soon as criteria change
   const accessExpenses = (items: ShoppingItem[]): string => {
     return items
       .reduce((accumulator, current) => accumulator + current.price, 0)
       .toFixed(2);
   };
 
+  // filter the shopping list based on selected criteria
   function filter(criteria: string) {
     return shoppingItems.filter((item) => item.category === criteria);
   }
 
+  // retrieved filtering criteria
   const getFilteringCriteria = (criteria: string) => {
     if (criteria === "all") {
       setShoppingList(shoppingItems);
@@ -42,6 +45,7 @@ const ShoppingList = ({ shoppingItems, categories, handleRemove }: Props) => {
     }
   };
 
+  // if there is nothing to show
   if (shoppingList.length === 0)
     return (
       <div className="col p-4 m-3" style={{ backgroundColor: "#eeeeee78" }}>
