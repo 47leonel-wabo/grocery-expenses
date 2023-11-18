@@ -47,7 +47,10 @@ function App() {
       </h1>
       <div className="row">
         <div className="col-6">
-          <ExpenseForm categories={categories} />
+          <ExpenseForm
+            categories={categories}
+            saveExpense={(item) => console.log(item)}
+          />
         </div>
         <div className="col-6">
           <ShoppingList
