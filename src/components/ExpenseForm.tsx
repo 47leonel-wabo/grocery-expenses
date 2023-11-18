@@ -28,7 +28,7 @@ const ExpenseForm = ({ categories, saveExpense }: Props) => {
   const {
     handleSubmit,
     register,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<formObject>({
     resolver: zodResolver(formSchema),
@@ -92,7 +92,7 @@ const ExpenseForm = ({ categories, saveExpense }: Props) => {
           handleChange={handleSelect}
         />
 
-        <button type="submit" className="btn btn-info">
+        <button disabled={!isValid} type="submit" className="btn btn-info">
           Save to List
         </button>
       </form>
