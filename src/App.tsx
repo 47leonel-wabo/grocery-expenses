@@ -1,54 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import AppAlert from "./components/AppAlert";
-import AppButton from "./components/AppButton";
-import ListGroup from "./components/ListGroup";
-import Like from "./components/Like";
-import ExpendableText from "./components/ExpendableText";
-import Form from "./components/Form";
-
-const cities = [
-  "Dakar",
-  "Bafoussam",
-  "Yaoundé",
-  "Ngaoundéré",
-  "Garoua",
-  "Bamako",
-];
+import userService, { User } from "./services/user-service";
+import UserCard from "./components/UserCard";
 
 function App() {
-  const [isAlertVisible, setAlertVisible] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState();
 
-  const closeAlert = () => {
-    setAlertVisible(false);
-  };
+  useEffect(() => {
+    const { controller, responsePromise } = userService.getAll<User>();
+    responsePromise
+      .then(({ data }) => setUsers(data))
+      .catch((error) => setError(error.message));
+
+    return () => controller.abort();
+  }, []);
 
   return (
-    <div>
-      <ListGroup
-        items={cities}
-        heading={"African Cities"}
-        onItemSelected={(item) => console.log(item)}
-      />
-      <AppButton color="success" handleClick={() => setAlertVisible(true)}>
-        Show Alert
-      </AppButton>
-      {isAlertVisible && (
-        <AppAlert
-          handleClose={closeAlert}
-          message="My custom alert message from the root node. Houraa!!"
-        />
-      )}
-      <Like
-        filled={false}
-        handleLike={(isLiked) => console.log("Is Liked", isLiked)}
-      />
-      <ExpendableText maxChars={125}>
-        Lorem ipsum dolor sit amet, voluptatum minima. Lorem ipsum dolor sit
-        amet, voluptatum minima. amet, voluptatum minima. amet, voluptatum
-        minima.
-      </ExpendableText>
-      <Form />
+    <div className="container">
+      <h4 className="display-6">
+        Axios | JSONPlaceHolder <mark>Users</mark>
+      </h4>
+      {error && <p className="text-danger">{error}</p>}
+      <div className="row">
+        {users.map((user) => (
+          <UserCard key={user.id} userData={user} />
+        ))}
+      </div>
     </div>
   );
 }
