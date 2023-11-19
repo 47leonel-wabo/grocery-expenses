@@ -1,25 +1,10 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import userService, { User } from "./services/user-service";
-import UserCard from "./components/UserCard";
 import LoadingSpinner from "./components/LoadingSpinner";
+import UserCard from "./components/UserCard";
+import useUsers from "./hooks/useUsers";
 
 function App() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState();
-
-  useEffect(() => {
-    setLoading(true);
-    const { controller, responsePromise } = userService.getAll<User>();
-    responsePromise
-      .then(({ data }) => setUsers(data))
-      .catch((error) => setError(error.message))
-      .finally(() => setLoading(false));
-
-    return () => controller.abort();
-  }, []);
-
+  const { users, error, isLoading } = useUsers();
   return (
     <div className="container">
       <h4 className="display-6">
